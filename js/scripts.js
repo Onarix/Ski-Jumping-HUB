@@ -1,49 +1,104 @@
-// Send request to API for links to competitions results
-function getResults() {
-    const url='http://127.0.0.1:5000/results/';
+//  UTILITES
+class Utils {
+  constructor() {}
+
+  static size_dict(d) {
+    let c = 0;
+    for (let {} in d) ++c;
+    return c;
+  }
+
+  // dark/light mode toggle
+  static mode_toggle() {
+    if (document.documentElement.getAttribute("data-bs-theme") == "dark") {
+      document.documentElement.setAttribute("data-bs-theme", "light");
+      let navbar = document.getElementsByClassName(
+        "navbar navbar-expand-lg navbar-night bg-night"
+      );
+      navbar[0].className = "navbar navbar-expand-lg navbar-light bg-light";
+      sessionStorage.setItem("darkMode", "OFF");
+    } else {
+      document.documentElement.setAttribute("data-bs-theme", "dark");
+      let navbar = document.getElementsByClassName(
+        "navbar navbar-expand-lg navbar-light bg-light"
+      );
+      navbar[0].className = "navbar navbar-expand-lg navbar-night bg-night";
+      sessionStorage.setItem("darkMode", "ON");
+    }
+  }
+
+  // check sessionStorage to determine current color mode
+  static mode_check() {
+    if (sessionStorage.getItem("darkMode") == "ON") {
+      this.mode_toggle();
+      document.getElementById("flexSwitchCheckDefault").checked = true;
+    }
+  }
+
+  // delete news on sidebar close to prevent stacking them
+  static deleteNews() {
+    let newsMenu = document.getElementById("menu");
+    let newsCount = newsMenu.getElementsByClassName("col").length;
+
+    let alert = document.getElementById("error-alert");
+    if (alert != null) alert.remove();
+
+    for (let i = 0; i < newsCount; i++) {
+      let news = document.getElementById("news");
+      news.remove();
+    }
+  }
+}
+
+//  REQUESTS
+class RequestFactory {
+  constructor() {}
+  // Send request to API for links to competitions results
+  static getResults() {
+    const url = "http://127.0.0.1:5000/results/";
     fetch(url)
-    .then(response => response.json())  
-    .then(data => {
+      .then((response) => response.json())
+      .then((data) => {
         const json_links = data;
         console.log(json_links);
-        
+
         let table = document.getElementById("results-table");
 
         for (let k in json_links) {
-            let row = table.insertRow(-1);
+          let row = table.insertRow(-1);
 
-            let c1 = row.insertCell(0);
-            let c2 = row.insertCell(1);
+          let c1 = row.insertCell(0);
+          let c2 = row.insertCell(1);
 
-            // Link to competition results
-            var hyperlink = document.createElement("td");
-            hyperlink.setAttribute("class", "btn");
-            hyperlink.setAttribute("onclick", "location.href='" + k + "'");
-            hyperlink.textContent = json_links[k][0];
-            
-            c1.appendChild(hyperlink);
-            c2.innerText = json_links[k][1];
-            
+          // Link to competition results
+          var hyperlink = document.createElement("td");
+          hyperlink.setAttribute("class", "btn");
+          hyperlink.setAttribute("onclick", "location.href='" + k + "'");
+          hyperlink.textContent = json_links[k][0];
+
+          c1.appendChild(hyperlink);
+          c2.innerText = json_links[k][1];
         }
-    })
-    .catch(error => {
+      })
+      .catch((error) => {
         // TypeError: failed to fetch
-        console.error('Error:', error);
+        console.error("Error:", error);
         let table = document.getElementById("table-data");
         let errorAlert = document.createElement("div");
         errorAlert.className = "alert alert-danger";
         errorAlert.role = "alert";
-        errorAlert.textContent = "ERROR: Failed to fetch data from internal server";
+        errorAlert.textContent =
+          "ERROR: Failed to fetch data from internal server";
         table.appendChild(errorAlert);
-    })
-}
+      });
+  }
 
-// Send request to API for google news
-function getNews() {
-    const url='http://127.0.0.1:5000/news/';
+  // Send request to API for google news
+  static getNews() {
+    const url = "http://127.0.0.1:5000/news/";
     fetch(url)
-    .then(response => response.json())  
-    .then(data => {
+      .then((response) => response.json())
+      .then((data) => {
         const json_news = data;
         console.log(json_news);
 
@@ -52,73 +107,100 @@ function getNews() {
         // json_news[key][2] - news image
 
         let newsMenu = document.getElementById("menu");
-        
-        for(let k in json_news) {
-            let newsCol = document.createElement("div");
-            newsCol.className = "col";
-            newsCol.id = "news";
 
-            let newsCard = document.createElement("div");
-            newsCard.className = "card";
+        for (let k in json_news) {
+          let newsCol = document.createElement("div");
+          newsCol.className = "col";
+          newsCol.id = "news";
 
-            let newsLink = document.createElement("a");
-            newsLink.href = k;
+          let newsCard = document.createElement("div");
+          newsCard.className = "card";
 
-            let newsImg = document.createElement("img");
-            newsImg.className = "card-img-top";
-            newsImg.src = json_news[k][2];
-            newsImg.alt = "Card image cap";
+          let newsLink = document.createElement("a");
+          newsLink.href = k;
 
-            newsLink.appendChild(newsImg);
-            newsCard.appendChild(newsLink);
+          let newsImg = document.createElement("img");
+          newsImg.className = "card-img-top";
+          newsImg.src = json_news[k][2];
+          newsImg.alt = "Card image cap";
 
-            let cardBody = document.createElement("div");
-            cardBody.className = "card-body";
-            
-            let newsTitle = document.createElement("h5");
-            newsTitle.className = "card-title";
-            newsTitle.textContent = json_news[k][0];
-            cardBody.appendChild(newsTitle);
+          newsLink.appendChild(newsImg);
+          newsCard.appendChild(newsLink);
 
-            let newsDate = document.createElement("p");
-            newsDate.className = "card-text";
-            let smallText = document.createElement("small");
-            smallText.className = "text-muted";
-            smallText.textContent = json_news[k][1];
-            newsDate.appendChild(smallText);
-            cardBody.appendChild(newsDate);
+          let cardBody = document.createElement("div");
+          cardBody.className = "card-body";
 
-            newsCard.appendChild(cardBody);
-            
-            newsCol.appendChild(newsCard);
+          let newsTitle = document.createElement("h5");
+          newsTitle.className = "card-title";
+          newsTitle.textContent = json_news[k][0];
+          cardBody.appendChild(newsTitle);
 
-            newsMenu.appendChild(newsCol);
+          let newsDate = document.createElement("p");
+          newsDate.className = "card-text";
+          let smallText = document.createElement("small");
+          smallText.className = "text-muted";
+          smallText.textContent = json_news[k][1];
+          newsDate.appendChild(smallText);
+          cardBody.appendChild(newsDate);
+
+          newsCard.appendChild(cardBody);
+
+          newsCol.appendChild(newsCard);
+
+          newsMenu.appendChild(newsCol);
         }
-    })
-    .catch(error => {
+      })
+      .catch((error) => {
         // TypeError: failed to fetch
-        console.error('Error:', error);
+        console.error("Error:", error);
         let table = document.getElementById("menu");
         let errorAlert = document.createElement("div");
         errorAlert.className = "alert alert-danger";
         errorAlert.role = "alert";
         errorAlert.id = "error-alert";
-        errorAlert.textContent = "ERROR: Failed to fetch data from internal server";
+        errorAlert.textContent =
+          "ERROR: Failed to fetch data from internal server";
         table.appendChild(errorAlert);
-    })
+      });
+  }
+
+  static getFunfacts() {
+    const url = "http://127.0.0.1:5000/funfacts/";
+    fetch(url)
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+        const json_funfacts = data;
+        let mainContent = document.getElementById("main-content");
+        let funfact = document.createElement("div");
+        let funfactTitle = document.createElement("h4");
+        funfactTitle.textContent = "Did you know?";
+        funfact.appendChild(funfactTitle);
+        let funfactContent = document.createElement("h6");
+        funfactContent.className = "text-muted";
+        funfactContent.textContent =
+          json_funfacts[
+            Math.floor(Math.random() * Utils.size_dict(json_funfacts))
+          ];
+        funfact.appendChild(funfactContent);
+        mainContent.appendChild(funfact);
+      })
+      .catch((error) => {
+        // TypeError: failed to fetch
+        console.error("Error:", error);
+        let mainContent = document.getElementById("main-content");
+        let errorAlert = document.createElement("div");
+        errorAlert.className = "alert alert-danger";
+        errorAlert.role = "alert";
+        errorAlert.id = "error-alert";
+        errorAlert.textContent =
+          "ERROR: Failed to fetch data from internal server";
+        mainContent.appendChild(errorAlert);
+      });
+  }
 }
 
-// delete news on sidebar close to prevent stacking them
-function deleteNews() {
-    let newsMenu = document.getElementById("menu");
-    let newsCount = newsMenu.getElementsByClassName("col").length;
-
-    let alert = document.getElementById("error-alert");
-    if(alert != null)
-        alert.remove();
-
-    for(let i = 0; i < newsCount; i++) {
-        let news = document.getElementById("news");
-        news.remove();
-    }
+// PAGE ANIMATIONS
+class Animations {
+  constructor() {}
 }
