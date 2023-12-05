@@ -57,7 +57,7 @@ def getNews():
     soup = BeautifulSoup(response.content, "lxml")
 
     # find news titles, pictures and publish date
-    news_soup = soup.find_all("h4")
+    news_soup = soup.select("h4")
 
     links = list()
     dates = list()
@@ -66,10 +66,10 @@ def getNews():
 
     base_url = "https://news.google.com"
     for link in soup.find_all("a", href=True):
-        if str(link["href"]).startswith("./articles/"):
+        if str(link["href"]).startswith("./articles/") and (
+            links.count(base_url + link["href"][1:]) == 0
+        ):
             links.append(base_url + link["href"][1:])
-
-    links = links[:5]
 
     for date in soup.find_all("time"):
         dates.append(date.text)
@@ -77,13 +77,12 @@ def getNews():
     for img in soup.find_all("img", class_="Quavad", src=True):
         imgs.append(img["src"])
 
-    imgs = imgs[:5]
-
     i = 0
-    for elem in news_soup[:5]:
+    for elem in news_soup:
+        if i >= 5:
+            break
         news[links[i]] = [elem.text, dates[i], imgs[i]]
         i += 1
-
     return jsonify(news)
 
 
@@ -92,3 +91,10 @@ def getFunfacts():
     with open("funfacts.json") as f:
         funfacts = json.load(f)
     return jsonify(funfacts)
+
+
+@app.route("/hills/", methods=["GET"])
+def getHills():
+    with open("hills.json") as f:
+        hills = json.load(f)
+    return jsonify(hills)

@@ -8,6 +8,13 @@ class Utils {
     return c;
   }
 
+  static delay(func, ms) {
+    console.log("sleep");
+    setTimeout(() => {
+      func();
+    }, ms);
+  }
+
   // dark/light mode toggle
   static mode_toggle() {
     if (document.documentElement.getAttribute("data-bs-theme") == "dark") {
@@ -164,6 +171,7 @@ class RequestFactory {
       });
   }
 
+  // get Funfacts from JSON file
   static getFunfacts() {
     const url = "http://127.0.0.1:5000/funfacts/";
     fetch(url)
@@ -174,10 +182,12 @@ class RequestFactory {
         let mainContent = document.getElementById("main-content");
         let funfact = document.createElement("div");
         let funfactTitle = document.createElement("h4");
+        funfactTitle.className = "funfact";
         funfactTitle.textContent = "Did you know?";
         funfact.appendChild(funfactTitle);
         let funfactContent = document.createElement("h6");
-        funfactContent.className = "text-muted";
+        funfactContent.className = "text-muted funfact";
+        funfactContent.id = "Funfact";
         funfactContent.textContent =
           json_funfacts[
             Math.floor(Math.random() * Utils.size_dict(json_funfacts))
@@ -198,9 +208,210 @@ class RequestFactory {
         mainContent.appendChild(errorAlert);
       });
   }
+
+  // get Hills from JSON file
+  static getHills() {
+    const url = "http://127.0.0.1:5000/hills/";
+    fetch(url)
+      .then((response) => response.json())
+      .then((data) => {
+        const json_hills = data;
+        for (let k in json_hills) {
+          let accordion = document.getElementById("accordion");
+          let card = document.createElement("div");
+          card.className = "card";
+          let cardHeader = document.createElement("div");
+          cardHeader.className = "card-header";
+          cardHeader.id = "heading" + k;
+          let cardHeaderContent = document.createElement("h5");
+          cardHeaderContent.className = "mb-0";
+          let cardHeaderButton = document.createElement("button");
+          cardHeaderButton.className = "btn";
+          cardHeaderButton.setAttribute("data-bs-toggle", "collapse");
+          cardHeaderButton.setAttribute("data-bs-target", "#collapse" + k);
+          cardHeaderButton.setAttribute("aria-expanded", "true");
+          cardHeaderButton.setAttribute("aria-controls", "collapse" + k);
+          cardHeaderButton.textContent = json_hills[k]["name"];
+          cardHeaderContent.appendChild(cardHeaderButton);
+          cardHeader.appendChild(cardHeaderContent);
+          card.appendChild(cardHeader);
+
+          let cardOuter = document.createElement("div");
+          cardOuter.id = "collapse" + k;
+          if (parseInt(k) + 1 == Utils.size_dict(json_hills))
+            cardOuter.className = "collapse show";
+          else cardOuter.className = "collapse";
+          cardOuter.setAttribute("aria-labelledby", "heading" + k);
+          cardOuter.setAttribute("data-bs-parent", "#accordion");
+          let cardBody = document.createElement("div");
+          cardBody.className = "card-body";
+          let cardImg = document.createElement("img");
+          cardImg.src = json_hills[k]["img"];
+          cardImg.alt = json_hills[k]["name"];
+          cardImg.className = "img-fluid";
+          cardBody.appendChild(cardImg);
+          let cardRow = document.createElement("div");
+          cardRow.className = "row";
+          let cardCol_1 = document.createElement("div");
+          cardCol_1.className = "col";
+
+          // record
+          let record = document.createElement("div");
+          record.className = "record";
+          let recordLabel = document.createElement("b");
+          recordLabel.textContent = "Hill record: ";
+          let recordValue = document.createElement("span");
+          recordValue.textContent = json_hills[k]["record"];
+          record.appendChild(recordLabel);
+          record.appendChild(recordValue);
+          cardCol_1.appendChild(record);
+          // HS point
+          let hs = document.createElement("div");
+          hs.className = "hs";
+          let hsLabel = document.createElement("b");
+          hsLabel.textContent = "HS point: ";
+          let hsValue = document.createElement("span");
+          hsValue.textContent = json_hills[k]["hs"];
+          hs.appendChild(hsLabel);
+          hs.appendChild(hsValue);
+          cardCol_1.appendChild(hs);
+          // Construction year
+          let constrYear = document.createElement("div");
+          constrYear.className = "construction-year";
+          let constrYearLabel = document.createElement("b");
+          constrYearLabel.textContent = "Construction year: ";
+          let constrYearValue = document.createElement("span");
+          constrYearValue.textContent = json_hills[k]["construction_year"];
+          constrYear.appendChild(constrYearLabel);
+          constrYear.appendChild(constrYearValue);
+          cardCol_1.appendChild(constrYear);
+          // Table angle
+          let tableAngle = document.createElement("div");
+          tableAngle.className = "table-angle";
+          let tableAngleLabel = document.createElement("b");
+          tableAngleLabel.textContent = "Table angle: ";
+          let tableAngleValue = document.createElement("span");
+          tableAngleValue.textContent = json_hills[k]["table_angle"];
+          tableAngle.appendChild(tableAngleLabel);
+          tableAngle.appendChild(tableAngleValue);
+          cardCol_1.appendChild(tableAngle);
+          // Inrun length
+          let inrunLength = document.createElement("div");
+          inrunLength.className = "inrun-length";
+          let inrunLengthLabel = document.createElement("b");
+          inrunLengthLabel.textContent = "Inrun length: ";
+          let inrunLengthValue = document.createElement("span");
+          inrunLengthValue.textContent = json_hills[k]["inrun_length"];
+          inrunLength.appendChild(inrunLengthLabel);
+          inrunLength.appendChild(inrunLengthValue);
+          cardCol_1.appendChild(inrunLength);
+          // Average speed
+          let avgSpeed = document.createElement("div");
+          avgSpeed.className = "average-spd";
+          let avgSpeedLabel = document.createElement("b");
+          avgSpeedLabel.textContent = "Average speed: ";
+          let avgSpeedValue = document.createElement("span");
+          avgSpeedValue.textContent = json_hills[k]["average_spd"];
+          avgSpeed.appendChild(avgSpeedLabel);
+          avgSpeed.appendChild(avgSpeedValue);
+          cardCol_1.appendChild(avgSpeed);
+          cardRow.appendChild(cardCol_1);
+
+          let cardCol_2 = document.createElement("div");
+          cardCol_2.className = "col";
+
+          // Town
+          let town = document.createElement("div");
+          town.className = "town";
+          let townLabel = document.createElement("b");
+          townLabel.textContent = "Town: ";
+          let townValue = document.createElement("span");
+          townValue.textContent = json_hills[k]["town"];
+          town.appendChild(townLabel);
+          town.appendChild(townValue);
+          cardCol_2.appendChild(town);
+          // K-point
+          let K = document.createElement("div");
+          K.className = "K";
+          let KLabel = document.createElement("b");
+          KLabel.textContent = "K-point:";
+          let KValue = document.createElement("span");
+          KValue.textContent = json_hills[k]["K"];
+          K.appendChild(KLabel);
+          K.appendChild(KValue);
+          cardCol_2.appendChild(K);
+          // Hills in town
+          let hillsTown = document.createElement("div");
+          hillsTown.className = "hills-in-town";
+          let hillsTownLabel = document.createElement("b");
+          hillsTownLabel.textContent = "Hills in town: ";
+          let hillsTownValue = document.createElement("span");
+          hillsTownValue.textContent = json_hills[k]["hills_in_town"];
+          hillsTown.appendChild(hillsTownLabel);
+          hillsTown.appendChild(hillsTownValue);
+          cardCol_2.appendChild(hillsTown);
+          // Table height
+          let tableHeight = document.createElement("div");
+          tableHeight.className = "table-height";
+          let tableHeightLabel = document.createElement("b");
+          tableHeightLabel.textContent = "Table height: ";
+          let tableHeightValue = document.createElement("span");
+          tableHeightValue.textContent = json_hills[k]["table_height"];
+          tableHeight.appendChild(tableHeightLabel);
+          tableHeight.appendChild(tableHeightValue);
+          cardCol_2.appendChild(tableHeight);
+          // Landing area angle
+          let landingArea = document.createElement("div");
+          landingArea.className = "landing-area-angle";
+          let landingAreaLabel = document.createElement("b");
+          landingAreaLabel.textContent = "Landing area angle: ";
+          let landingAreaValue = document.createElement("span");
+          landingAreaValue.textContent = json_hills[k]["landing_area_angle"];
+          landingArea.appendChild(landingAreaLabel);
+          landingArea.appendChild(landingAreaValue);
+          cardCol_2.appendChild(landingArea);
+          // Stadion capacity
+          let stadionCap = document.createElement("div");
+          stadionCap.className = "stadion-capacity";
+          let stadionCapLabel = document.createElement("b");
+          stadionCapLabel.textContent = "Stadion capacity: ";
+          let stadionCapValue = document.createElement("span");
+          stadionCapValue.textContent = json_hills[k]["stadion_capacity"];
+          stadionCap.appendChild(stadionCapLabel);
+          stadionCap.appendChild(stadionCapValue);
+          cardCol_2.appendChild(stadionCap);
+          cardRow.appendChild(cardCol_2);
+
+          cardBody.appendChild(cardRow);
+          cardOuter.appendChild(cardBody);
+          card.appendChild(cardOuter);
+          accordion.appendChild(card);
+        }
+      })
+      .catch((error) => {
+        // TypeError: failed to fetch
+        console.error("Error:", error);
+        let mainContent = document.getElementById("accordion");
+        let errorAlert = document.createElement("div");
+        errorAlert.className = "alert alert-danger";
+        errorAlert.role = "alert";
+        errorAlert.id = "error-alert";
+        errorAlert.textContent =
+          "ERROR: Failed to fetch data from internal server";
+        mainContent.appendChild(errorAlert);
+      });
+  }
 }
 
 // PAGE ANIMATIONS
 class Animations {
   constructor() {}
+  static funfactEmerge() {
+    const title = document.querySelector(".funfact");
+    const funfact = document.querySelector(".text-muted.funfact");
+    title.classList.add("emerge");
+    setTimeout(() => {
+      funfact.classList.add("emerge");
+    }, 1000);
+  }
 }
