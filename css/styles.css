@@ -1,19 +1,34 @@
+/* Navbar */
 .bg-night {
     --bs-bg-opacity: 1;
-    background-image: none; 
+    background-image: none;
     background: #2c3035 !important;
 }
 
 .navbar-night {
-    background-image: none; 
-    background: #2c3035; 
+    background-image: none;
+    background: #2c3035;
 }
 
+/* Funfact */
 .funfact {
     opacity: 0;
     transition: opacity 1s ease;
 }
 
+/* Result */
+.result {
+    opacity: 0;
+    transition: opacity 1s ease;
+}
+
+/* News */
+.news {
+    opacity: 0;
+    transition: opacity 1s ease;
+}
+
+/* Emerge anim */
 .emerge {
     opacity: 1;
-  }
+}

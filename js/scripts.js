@@ -15,6 +15,9 @@ class Utils {
     }, ms);
   }
 
+  // Returns a Promise that resolves after "ms" Milliseconds
+  static timer = (ms) => new Promise((res) => setTimeout(res, ms));
+
   // dark/light mode toggle
   static mode_toggle() {
     if (document.documentElement.getAttribute("data-bs-theme") == "dark") {
@@ -56,6 +59,8 @@ class Utils {
     }
   }
 }
+// uncomment line below to do tests
+//module.exports = Utils; 
 
 //  REQUESTS
 class RequestFactory {
@@ -73,6 +78,7 @@ class RequestFactory {
 
         for (let k in json_links) {
           let row = table.insertRow(-1);
+          row.classList.add("result");
 
           let c1 = row.insertCell(0);
           let c2 = row.insertCell(1);
@@ -117,7 +123,7 @@ class RequestFactory {
 
         for (let k in json_news) {
           let newsCol = document.createElement("div");
-          newsCol.className = "col";
+          newsCol.className = "col news";
           newsCol.id = "news";
 
           let newsCard = document.createElement("div");
@@ -188,10 +194,12 @@ class RequestFactory {
         let funfactContent = document.createElement("h6");
         funfactContent.className = "text-muted funfact";
         funfactContent.id = "Funfact";
-        funfactContent.textContent =
-          json_funfacts[
-            Math.floor(Math.random() * Utils.size_dict(json_funfacts))
-          ];
+        do {
+          funfactContent.textContent =
+            json_funfacts[
+              Math.floor(Math.random() * Utils.size_dict(json_funfacts))
+            ];
+        } while (funfactContent.textContent === null);
         funfact.appendChild(funfactContent);
         mainContent.appendChild(funfact);
       })
@@ -413,5 +421,21 @@ class Animations {
     setTimeout(() => {
       funfact.classList.add("emerge");
     }, 1000);
+  }
+
+  static async resultsEmerge() {
+    const result = document.querySelectorAll(".result");
+    for (let i = 0; i < result.length; i++) {
+      result[i].classList.add("emerge");
+      await Utils.timer(300);
+    }
+  }
+
+  static async newsEmerge() {
+    const news = document.querySelectorAll(".news");
+    for (let i = 0; i < news.length; i++) {
+      news[i].classList.add("emerge");
+      await Utils.timer(300);
+    }
   }
 }
