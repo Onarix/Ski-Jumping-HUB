@@ -57,7 +57,7 @@ def getNews():
     soup = BeautifulSoup(response.content, "lxml")
 
     # find news titles, pictures and publish date
-    news_soup = soup.select("h4")
+    news_soup = soup.select(".JtKRv")
 
     links = list()
     dates = list()
